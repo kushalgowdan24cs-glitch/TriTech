@@ -31,19 +31,19 @@
 
 ---
 
-## 3. Five-Category Violation Taxonomy
+## 3. Five-Category Violation Taxonomy (PV01 - PV05)
 
-The platform standardizes enforcement on exactly **five** centralized categories:
+The platform standardizes enforcement on exactly **five** centralized categories with unambiguous codes:
 
-1. **Traffic Obstruction (`TOB`):** Blocking fire hydrants, emergency lanes, crosswalks, tram tracks, or active roadways. *(Default Priority: Critical)*
-2. **Parking Space Misuse (`PSM`):** Unauthorized parking in disabled/handicapped stalls or blocking EV fast chargers. *(Default Priority: High)*
-3. **No-Parking Zone Violation (`NPZ`):** Red curb corridors, tow-away zones, bus stops, or strict no-parking areas. *(Default Priority: Medium)*
-4. **Improper Parking (`IMP`):** Double parking, diagonal straddling, curb mounting, or sidewalk obstruction. *(Default Priority: Medium)*
-5. **Overstay Violation (`OST`):** Expired municipal meters or exceeding posted time limits. *(Default Priority: Low)*
+1. **`PV01` — No-Parking Zone Violation:** Red curb corridors, tow-away zones, bus stops, or strict no-parking areas. *(Default Priority: Medium)*
+2. **`PV02` — Improper Parking:** Double parking, diagonal straddling, curb mounting, or sidewalk obstruction. *(Default Priority: Medium)*
+3. **`PV03` — Parking Space Misuse:** Unauthorized parking in disabled/handicapped stalls or blocking EV fast chargers. *(Default Priority: High)*
+4. **`PV04` — Overstay Violation:** Expired municipal meters or exceeding posted time limits. *(Default Priority: Low)*
+5. **`PV05` — Traffic Obstruction:** Blocking fire hydrants, emergency lanes, crosswalks, tram tracks, or active roadways. *(Default Priority: Critical)*
 
 ### Deterministic Conflict Resolution Hierarchy:
 When an incident description matches multiple patterns, PARKGUARD enforces a deterministic safety precedence:
-$$\text{Traffic Obstruction} \succ \text{Parking Space Misuse} \succ \text{No-Parking Zone Violation} \succ \text{Improper Parking} \succ \text{Overstay Violation}$$
+$$\text{Traffic Obstruction (PV05)} \succ \text{Parking Space Misuse (PV03)} \succ \text{No-Parking Zone Violation (PV01)} \succ \text{Improper Parking (PV02)} \succ \text{Overstay Violation (PV04)}$$
 Any mention of life-safety keywords (e.g., *fire hydrant*, *ambulance*, *emergency*) immediately overrides standard taxonomy and forces **Critical Priority**.
 
 ---
@@ -59,9 +59,10 @@ PARKGUARD implements a formal state machine simulator $M = (Q, \Sigma, \delta, q
 - **Equivalent Regex:** `^[A-Z]{2}[- ]?[0-9]{2}[- ]?[A-Z]{1,2}[- ]?[0-9]{4}$`
 
 ### Violation Code DFA:
-- **States $Q$:** `V_START`, `V_N`, `V_NP`, `V_I`, `V_IM`, `V_P`, `V_PS`, `V_O`, `V_OS`, `V_T`, `V_TO`, `V_CAT_DONE`, `V_HYPHEN`, `V_D1`, `V_D2`, `V_ACCEPT`, `TRAP`
+- **Alphabet $\Sigma$:** `{'P', 'V', '0', '1', '2', '3', '4', '5'}`
+- **States $Q$:** `V_START`, `V_P`, `V_PV`, `V_PV0`, `V_ACCEPT`, `TRAP`
 - **Accept States $F$:** `{ V_ACCEPT }`
-- **Equivalent Regex:** `^(NPZ|IMP|PSM|OST|TOB)-[0-9]{3}$`
+- **Equivalent Regex:** `^(PV01|PV02|PV03|PV04|PV05)$`
 
 Dual execution runs in real time on both client and server, reporting exact agreement ($L(DFA) \equiv L(Regex)$), character-by-character transition traces, and step count.
 

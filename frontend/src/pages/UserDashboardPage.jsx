@@ -25,6 +25,16 @@ export function UserDashboardPage() {
   const [selectedReportDetails, setSelectedReportDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
+  const [recentIds, setRecentIds] = useState([]);
+
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('parkguard_recent_reports') || '[]');
+      setRecentIds(stored);
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
 
   // Load summary stats and reports
   const loadData = async (query = '') => {
@@ -115,6 +125,26 @@ export function UserDashboardPage() {
           </button>
         </form>
       </div>
+
+      {/* Recent Submissions Quick Select */}
+      {recentIds.length > 0 && (
+        <div className="my-4 p-3 bg-slate-900/60 rounded-xl border border-slate-800 flex flex-wrap items-center gap-2 text-xs">
+          <span className="text-slate-400 font-semibold">Your Recent Submissions:</span>
+          {recentIds.map(id => (
+            <button
+              key={id}
+              onClick={() => {
+                setSearchQuery(id);
+                setSearchParams({ search: id });
+                loadData(id);
+              }}
+              className="px-2.5 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 font-mono text-[11px] font-bold cursor-pointer transition flex items-center gap-1"
+            >
+              <span>{id}</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Summary KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 my-6">

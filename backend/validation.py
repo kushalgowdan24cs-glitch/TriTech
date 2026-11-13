@@ -200,63 +200,33 @@ vehicle_dfa = DFA(
 
 # ==============================================================================
 # 2. VIOLATION CODE DFA & REGEX
-# Format: (NPZ|IMP|PSM|OST|TOB)-[0-9]{3}
+# Format: (PV01|PV02|PV03|PV04|PV05)
 # ==============================================================================
-VIOLATION_CODE_REGEX = r'^(NPZ|IMP|PSM|OST|TOB)-[0-9]{3}$'
+VIOLATION_CODE_REGEX = r'^(PV01|PV02|PV03|PV04|PV05)$'
 
 def _violation_code_dfa_transition(state: str, ch: str) -> Optional[str]:
     ch_upper = ch.upper()
-    is_digit = '0' <= ch_upper <= '9'
 
     if state == "V_START":
-        if ch_upper == 'N': return "V_N"
-        if ch_upper == 'I': return "V_I"
-        if ch_upper == 'P': return "V_P"
-        if ch_upper == 'O': return "V_O"
-        if ch_upper == 'T': return "V_T"
-        return "TRAP"
-    elif state == "V_N":
-        return "V_NP" if ch_upper == 'P' else "TRAP"
-    elif state == "V_NP":
-        return "V_CAT_DONE" if ch_upper == 'Z' else "TRAP"
-    elif state == "V_I":
-        return "V_IM" if ch_upper == 'M' else "TRAP"
-    elif state == "V_IM":
-        return "V_CAT_DONE" if ch_upper == 'P' else "TRAP"
+        return "V_P" if ch_upper == 'P' else "TRAP"
     elif state == "V_P":
-        return "V_PS" if ch_upper == 'S' else "TRAP"
-    elif state == "V_PS":
-        return "V_CAT_DONE" if ch_upper == 'M' else "TRAP"
-    elif state == "V_O":
-        return "V_OS" if ch_upper == 'S' else "TRAP"
-    elif state == "V_OS":
-        return "V_CAT_DONE" if ch_upper == 'T' else "TRAP"
-    elif state == "V_T":
-        return "V_TO" if ch_upper == 'O' else "TRAP"
-    elif state == "V_TO":
-        return "V_CAT_DONE" if ch_upper == 'B' else "TRAP"
-    elif state == "V_CAT_DONE":
-        return "V_HYPHEN" if ch == '-' else "TRAP"
-    elif state == "V_HYPHEN":
-        return "V_D1" if is_digit else "TRAP"
-    elif state == "V_D1":
-        return "V_D2" if is_digit else "TRAP"
-    elif state == "V_D2":
-        return "V_ACCEPT" if is_digit else "TRAP"
+        return "V_PV" if ch_upper == 'V' else "TRAP"
+    elif state == "V_PV":
+        return "V_PV0" if ch_upper == '0' else "TRAP"
+    elif state == "V_PV0":
+        return "V_ACCEPT" if ch_upper in ('1', '2', '3', '4', '5') else "TRAP"
     elif state == "V_ACCEPT":
         return "TRAP"
     return "TRAP"
 
 violation_code_dfa = DFA(
     states=[
-        "V_START", "V_N", "V_NP", "V_I", "V_IM", "V_P", "V_PS", 
-        "V_O", "V_OS", "V_T", "V_TO", "V_CAT_DONE", "V_HYPHEN", 
-        "V_D1", "V_D2", "V_ACCEPT", "TRAP"
+        "V_START", "V_P", "V_PV", "V_PV0", "V_ACCEPT", "TRAP"
     ],
     start_state="V_START",
     accept_states=["V_ACCEPT"],
     transition_fn=_violation_code_dfa_transition,
-    description="DFA for Parking Violation Codes: (NPZ|IMP|PSM|OST|TOB)-[0-9]{3}"
+    description="DFA for Parking Violation Codes: (PV01|PV02|PV03|PV04|PV05)"
 )
 
 
@@ -353,7 +323,7 @@ def validate_field(field_name: str, value: str) -> Dict[str, Any]:
     elif field_name == "violation_code":
         dfa_res = violation_code_dfa.simulate(val_str.upper())
         regex_valid = bool(re.match(VIOLATION_CODE_REGEX, val_str.upper()))
-        rule_desc = "Must match format (NPZ|IMP|PSM|OST|TOB)-XXX with 3 digits, e.g., NPZ-101"
+        rule_desc = "Must match standard violation code: (PV01|PV02|PV03|PV04|PV05)"
     elif field_name == "phone":
         dfa_res = phone_dfa.simulate(val_str)
         regex_valid = bool(re.match(PHONE_REGEX, val_str))

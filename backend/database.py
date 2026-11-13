@@ -208,63 +208,63 @@ def seed_initial_data(conn):
     sample_reports = [
         (
             "PKG-2026-0001", "Jonathan Miller", "j.miller@transit.org", "9812345670",
-            "DL-04-AX-5521", "Sedan", "TOB-501", "Traffic Obstruction",
+            "DL-04-AX-5521", "Sedan", "PV05", "Traffic Obstruction",
             "Zone C - Hospital & Transit Hub", "Vehicle completely blocking ambulance bay entrance at Regional Trauma Center.",
             "Critical", "In Progress", h_patel,
             (now - timedelta(hours=3)).isoformat()
         ),
         (
             "PKG-2026-0002", "Maya Lin", "maya.lin@citycorp.com", "9876543210",
-            "CA-12-XY-9876", "SUV / Crossover", "PSM-301", "Parking Space Misuse",
+            "CA-12-XY-9876", "SUV / Crossover", "PV03", "Parking Space Misuse",
             "Zone A - Downtown Commercial", "Luxury SUV parked in designated handicapped spot without disability placard.",
             "High", "Resolved", h_vance,
             (now - timedelta(hours=6)).isoformat()
         ),
         (
             "PKG-2026-0003", "Robert Chen", "rchen@metropolis.gov", "9823456789",
-            "NY-02-CD-4412", "Truck / Heavy Commercial", "NPZ-101", "No-Parking Zone Violation",
+            "NY-02-CD-4412", "Truck / Heavy Commercial", "PV01", "No-Parking Zone Violation",
             "Zone A - Downtown Commercial", "Commercial delivery box truck idling in clearly marked red tow-away lane.",
             "High", "In Progress", h_jenkins,
             (now - timedelta(hours=2)).isoformat()
         ),
         (
             "PKG-2026-0004", "Fatima Al-Sayed", "fatima.as@gmail.com", "9834567890",
-            "MH-12-DE-1433", "Sedan", "OST-401", "Overstay Violation",
+            "MH-12-DE-1433", "Sedan", "PV04", "Overstay Violation",
             "Zone D - Industrial & Port", "Unattended sedan parked past the 2-hour posted municipal time limit.",
             "Low", "Resolved", h_mendez,
             (now - timedelta(days=1)).isoformat()
         ),
         (
             "PKG-2026-0005", "David Wright", "dwright@civicmail.net", "9845678901",
-            "DL-01-AB-1234", "Van / Minibus", "IMP-201", "Improper Parking",
+            "DL-01-AB-1234", "Van / Minibus", "PV02", "Improper Parking",
             "Zone A - Downtown Commercial", "Van straddling two parking bays and encroaching into pedestrian sidewalk.",
             "Medium", "Assigned", h_vance,
             (now - timedelta(minutes=45)).isoformat()
         ),
         (
             "PKG-2026-0006", "Clara Oswald", "coswald@metrotransit.org", "9856789012",
-            "KA-03-MG-7890", "Sedan", "TOB-502", "Traffic Obstruction",
+            "KA-03-MG-7890", "Sedan", "PV05", "Traffic Obstruction",
             "Zone B - Residential North", "Parked vehicle blocking residential crosswalk and private driveway.",
             "Critical", "In Progress", h_rostova,
             (now - timedelta(hours=1, minutes=15)).isoformat()
         ),
         (
             "PKG-2026-0007", "Samuel Green", "sgreen@greentech.io", "9867890123",
-            "TS-07-EK-3344", "Electric Vehicle (EV)", "PSM-302", "Parking Space Misuse",
+            "TS-07-EK-3344", "Electric Vehicle (EV)", "PV03", "Parking Space Misuse",
             "Zone C - Hospital & Transit Hub", "Unplugged vehicle occupying dedicated rapid EV charging terminal.",
             "Medium", "Resolved", h_kim,
             (now - timedelta(days=1, hours=2)).isoformat()
         ),
         (
             "PKG-2026-0008", "Angela Davis", "angela.d@neighborhood.org", "9878901234",
-            "HR-26-BR-9900", "SUV / Crossover", "NPZ-102", "No-Parking Zone Violation",
+            "HR-26-BR-9900", "SUV / Crossover", "PV01", "No-Parking Zone Violation",
             "Zone C - Hospital & Transit Hub", "Vehicle parked directly under No-Parking Anytime municipal signage.",
             "Medium", "Assigned", h_kim,
             (now - timedelta(minutes=30)).isoformat()
         ),
         (
             "PKG-2026-0009", "Trevor Phillips", "tphillips@logistics.net", "9889012345",
-            "UP-16-ZZ-1122", "Truck / Heavy Commercial", "TOB-501", "Traffic Obstruction",
+            "UP-16-ZZ-1122", "Truck / Heavy Commercial", "PV05", "Traffic Obstruction",
             "Zone A - Downtown Commercial", "Heavy flatbed trailer left obstructing fire hydrant adjacent to high-rise building.",
             "Critical", "In Progress", h_jenkins,
             (now - timedelta(minutes=20)).isoformat()

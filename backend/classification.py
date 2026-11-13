@@ -47,13 +47,13 @@ CATEGORY_PRECEDENCE = [
     "Overstay Violation"          # Rank 5: Temporal tariff compliance
 ]
 
-# Code Prefix to Category Map
-PREFIX_TO_CATEGORY = {
-    "NPZ": "No-Parking Zone Violation",
-    "IMP": "Improper Parking",
-    "PSM": "Parking Space Misuse",
-    "OST": "Overstay Violation",
-    "TOB": "Traffic Obstruction"
+# Code to Category Map for PV01 - PV05
+CODE_TO_CATEGORY = {
+    "PV01": "No-Parking Zone Violation",
+    "PV02": "Improper Parking",
+    "PV03": "Parking Space Misuse",
+    "PV04": "Overstay Violation",
+    "PV05": "Traffic Obstruction"
 }
 
 
@@ -69,19 +69,23 @@ def classify_violation(
     clean_desc = (description or "").lower()
     clean_code = (violation_code or "").upper().strip()
 
-    # Step 1: Detect category from structured violation code
+    # Step 1: Detect category from structured violation code (PV01 - PV05)
     code_category = None
     code_priority = None
 
     if clean_code in VIOLATION_CODES:
         code_category = VIOLATION_CODES[clean_code]["category"]
         code_priority = VIOLATION_CODES[clean_code]["priority"]
-    else:
-        # Check prefix
-        for prefix, cat_name in PREFIX_TO_CATEGORY.items():
-            if clean_code.startswith(prefix):
-                code_category = cat_name
-                break
+    elif clean_code in CODE_TO_CATEGORY:
+        code_category = CODE_TO_CATEGORY[clean_code]
+        if clean_code == "PV05":
+            code_priority = "Critical"
+        elif clean_code == "PV03":
+            code_priority = "High"
+        elif clean_code == "PV04":
+            code_priority = "Low"
+        else:
+            code_priority = "Medium"
 
     # Step 2: Keyword matching in description
     keyword_matches = {}
@@ -128,14 +132,17 @@ def classify_violation(
     priority_reason = []
 
     # Priority determination rules:
-    if emergency_trigger or final_category == "Traffic Obstruction" or urgency_input == "Critical":
+    if emergency_trigger or final_category == "Traffic Obstruction" or clean_code == "PV05" or urgency_input == "Critical":
         final_priority = "Critical"
         priority_reason.append("Assigned CRITICAL priority: Active obstruction of traffic flow or emergency corridor.")
     elif (
         final_category == "Parking Space Misuse" and any(k in clean_desc for k in ["handicap", "disabled", "wheelchair"])
-    ) or clean_code in ["PSM-301", "IMP-201", "TOB-501", "NPZ-101"] or urgency_input == "High":
+    ) or clean_code == "PV03" or urgency_input == "High":
         final_priority = "High"
         priority_reason.append("Assigned HIGH priority: Severe accessibility violation or high-impact congestion.")
+    elif clean_code == "PV04" and urgency_input not in ["High", "Critical"]:
+        final_priority = "Low"
+        priority_reason.append("Assigned LOW priority: Standard overstay duration infraction.")
     elif urgency_input in ["High", "Low", "Medium"]:
         final_priority = urgency_input
         priority_reason.append(f"Priority aligned with reporter urgency '{urgency_input}'.")
@@ -170,4 +177,3 @@ def generate_unique_report_id(db_cursor=None) -> str:
             pass
     rand_suffix = random.randint(1000, 9999)
     return f"PKG-{year}-{rand_suffix}"
-

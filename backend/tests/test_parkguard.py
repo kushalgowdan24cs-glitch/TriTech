@@ -180,8 +180,10 @@ def test_regex_and_dfa_agreement():
     test_inputs = [
         ("vehicle_number", "DL-01-AB-1234"),
         ("vehicle_number", "INVALID-PLATE"),
-        ("violation_code", "NPZ-101"),
+        ("violation_code", "PV01"),
+        ("violation_code", "PV05"),
         ("violation_code", "XYZ-999"),
+        ("violation_code", "PV06"),
         ("phone", "9876543210"),
         ("phone", "invalid-phone"),
         ("reporter_email", "admin@parkguard.gov"),
@@ -194,15 +196,15 @@ def test_regex_and_dfa_agreement():
 
 
 # ==============================================================================
-# TEST CASE 6: Correct Classification for All Five Categories
+# TEST CASE 6: Correct Classification for All Five Categories (PV01 - PV05)
 # ==============================================================================
 def test_correct_classification_all_five_categories():
     scenarios = [
-        ("NPZ-101", "Vehicle left in posted red curb tow away lane", "No-Parking Zone Violation"),
-        ("IMP-201", "Car parked diagonally across lines straddling two spots", "Improper Parking"),
-        ("PSM-301", "Vehicle without handicap permit occupying disabled bay", "Parking Space Misuse"),
-        ("OST-401", "Meter expired 3 hours ago beyond posted limit", "Overstay Violation"),
-        ("TOB-501", "Car obstructing fire hydrant and blocking active street lane", "Traffic Obstruction")
+        ("PV01", "Vehicle left in posted red curb tow away lane", "No-Parking Zone Violation"),
+        ("PV02", "Car parked diagonally across lines straddling two spots", "Improper Parking"),
+        ("PV03", "Vehicle without handicap permit occupying disabled bay", "Parking Space Misuse"),
+        ("PV04", "Meter expired 3 hours ago beyond posted limit", "Overstay Violation"),
+        ("PV05", "Car obstructing fire hydrant and blocking active street lane", "Traffic Obstruction")
     ]
     for code, desc, expected_cat in scenarios:
         res = classify_violation(violation_code=code, description=desc)
@@ -215,7 +217,7 @@ def test_correct_classification_all_five_categories():
 def test_conflicting_classification_patterns():
     # Description contains overstay AND fire hydrant block
     res = classify_violation(
-        violation_code="OST-401",
+        violation_code="PV04",
         description="Car overstayed meter by 2 hours and is blocking fire hydrant and ambulance entrance"
     )
     # Life safety emergency override should win!
@@ -232,7 +234,10 @@ def test_invalid_violation_code():
     assert res["is_valid"] is False
     assert res["dfa_valid"] is False
 
-    res_short = validate_field("violation_code", "NPZ-1")
+    res_out_of_range = validate_field("violation_code", "PV06")
+    assert res_out_of_range["is_valid"] is False
+
+    res_short = validate_field("violation_code", "PV0")
     assert res_short["is_valid"] is False
 
 
@@ -247,7 +252,7 @@ def test_unknown_routing_zone(test_db):
             report_id, reporter_name, reporter_email, phone, vehicle_number,
             vehicle_type, violation_code, category, zone, description, priority, status
         ) VALUES ('PKG-2026-TEST01', 'Test User', 'u@test.com', '9876543210', 'DL-01-AB-1234',
-                  'Sedan', 'OST-401', 'Overstay Violation', 'Zone Unknown X', 'Overstay test', 'Low', 'Validated');
+                  'Sedan', 'PV04', 'Overstay Violation', 'Zone Unknown X', 'Overstay test', 'Low', 'Validated');
     """)
     conn.commit()
 
@@ -273,7 +278,7 @@ def test_available_handler_assignment(test_db):
             report_id, reporter_name, reporter_email, phone, vehicle_number,
             vehicle_type, violation_code, category, zone, description, priority, status
         ) VALUES ('PKG-2026-TEST10', 'John Doe', 'j@test.com', '9876543210', 'DL-01-AB-1234',
-                  'Sedan', 'TOB-501', 'Traffic Obstruction', 'Zone A', 'Blocked lane', 'Critical', 'Validated');
+                  'Sedan', 'PV05', 'Traffic Obstruction', 'Zone A', 'Blocked lane', 'Critical', 'Validated');
     """)
     conn.commit()
 
@@ -304,7 +309,7 @@ def test_unavailable_handler(test_db):
             report_id, reporter_name, reporter_email, phone, vehicle_number,
             vehicle_type, violation_code, category, zone, description, priority, status
         ) VALUES ('PKG-2026-TEST11', 'Jane Doe', 'jane@test.com', '9876543210', 'DL-01-AB-1234',
-                  'Sedan', 'TOB-501', 'Traffic Obstruction', 'Zone A', 'Blocked lane', 'High', 'Validated');
+                  'Sedan', 'PV05', 'Traffic Obstruction', 'Zone A', 'Blocked lane', 'High', 'Validated');
     """)
     conn.commit()
 
@@ -336,7 +341,7 @@ def test_handler_capacity_overflow(test_db):
             report_id, reporter_name, reporter_email, phone, vehicle_number,
             vehicle_type, violation_code, category, zone, description, priority, status
         ) VALUES ('PKG-2026-TEST12', 'Overflow User', 'o@test.com', '9876543210', 'DL-01-AB-1234',
-                  'Sedan', 'TOB-501', 'Traffic Obstruction', 'Zone A', 'Blocked lane', 'Low', 'Validated');
+                  'Sedan', 'PV05', 'Traffic Obstruction', 'Zone A', 'Blocked lane', 'Low', 'Validated');
     """)
     conn.commit()
 
@@ -368,7 +373,7 @@ def test_backup_handler_assignment(test_db):
             report_id, reporter_name, reporter_email, phone, vehicle_number,
             vehicle_type, violation_code, category, zone, description, priority, status
         ) VALUES ('PKG-2026-TEST13', 'User Backup', 'b@test.com', '9876543210', 'DL-01-AB-1234',
-                  'Sedan', 'TOB-501', 'Traffic Obstruction', 'Zone A', 'Blocked lane', 'High', 'Validated');
+                  'Sedan', 'PV05', 'Traffic Obstruction', 'Zone A', 'Blocked lane', 'High', 'Validated');
     """)
     conn.commit()
 
@@ -398,7 +403,7 @@ def test_critical_priority_override(test_db):
             report_id, reporter_name, reporter_email, phone, vehicle_number,
             vehicle_type, violation_code, category, zone, description, priority, status
         ) VALUES ('PKG-2026-TEST14', 'Crit User', 'crit@test.com', '9876543210', 'DL-01-AB-1234',
-                  'Sedan', 'TOB-501', 'Traffic Obstruction', 'Zone A', 'Emergency fire hydrant blocked', 'Critical', 'Validated');
+                  'Sedan', 'PV05', 'Traffic Obstruction', 'Zone A', 'Emergency fire hydrant blocked', 'Critical', 'Validated');
     """)
     conn.commit()
 
@@ -426,15 +431,15 @@ def test_queue_ordering(test_db):
     # Insert 3 queued reports: 1 Low, 1 Critical, 1 High
     cursor.execute("""
         INSERT INTO reports (report_id, reporter_name, reporter_email, phone, vehicle_number, vehicle_type, violation_code, category, zone, description, priority, status, created_at)
-        VALUES ('Q-LOW', 'User 1', 'u1@test.com', '9876543210', 'DL-01-AB-1234', 'Sedan', 'OST-401', 'Overstay Violation', 'Zone A', 'Meter expired', 'Low', 'Submitted', '2026-11-13 10:00:00');
+        VALUES ('Q-LOW', 'User 1', 'u1@test.com', '9876543210', 'DL-01-AB-1234', 'Sedan', 'PV04', 'Overstay Violation', 'Zone A', 'Meter expired', 'Low', 'Submitted', '2026-11-13 10:00:00');
     """)
     cursor.execute("""
         INSERT INTO reports (report_id, reporter_name, reporter_email, phone, vehicle_number, vehicle_type, violation_code, category, zone, description, priority, status, created_at)
-        VALUES ('Q-CRIT', 'User 2', 'u2@test.com', '9876543210', 'DL-01-AB-1234', 'Sedan', 'TOB-501', 'Traffic Obstruction', 'Zone A', 'Ambulance blocked', 'Critical', 'Escalated', '2026-11-13 10:05:00');
+        VALUES ('Q-CRIT', 'User 2', 'u2@test.com', '9876543210', 'DL-01-AB-1234', 'Sedan', 'PV05', 'Traffic Obstruction', 'Zone A', 'Ambulance blocked', 'Critical', 'Escalated', '2026-11-13 10:05:00');
     """)
     cursor.execute("""
         INSERT INTO reports (report_id, reporter_name, reporter_email, phone, vehicle_number, vehicle_type, violation_code, category, zone, description, priority, status, created_at)
-        VALUES ('Q-HIGH', 'User 3', 'u3@test.com', '9876543210', 'DL-01-AB-1234', 'Sedan', 'PSM-301', 'Traffic Obstruction', 'Zone A', 'Disabled bay blocked', 'High', 'Submitted', '2026-11-13 10:02:00');
+        VALUES ('Q-HIGH', 'User 3', 'u3@test.com', '9876543210', 'DL-01-AB-1234', 'Sedan', 'PV03', 'Traffic Obstruction', 'Zone A', 'Disabled bay blocked', 'High', 'Submitted', '2026-11-13 10:02:00');
     """)
     conn.commit()
 
@@ -460,7 +465,7 @@ def test_report_status_update_and_load_recalculation(test_db):
     # Insert an assigned report
     cursor.execute("""
         INSERT INTO reports (report_id, reporter_name, reporter_email, phone, vehicle_number, vehicle_type, violation_code, category, zone, description, priority, status, assigned_handler_id)
-        VALUES ('PKG-STATUS-01', 'User Stat', 's@test.com', '9876543210', 'DL-01-AB-1234', 'Sedan', 'TOB-501', 'Traffic Obstruction', 'Zone A', 'Desc', 'Medium', 'Assigned', 1);
+        VALUES ('PKG-STATUS-01', 'User Stat', 's@test.com', '9876543210', 'DL-01-AB-1234', 'Sedan', 'PV05', 'Traffic Obstruction', 'Zone A', 'Desc', 'Medium', 'Assigned', 1);
     """)
     conn.commit()
     recalculate_handler_loads(conn)
@@ -494,7 +499,7 @@ def test_database_persistence_restart(test_db):
 
     cursor.execute("""
         INSERT INTO reports (report_id, reporter_name, reporter_email, phone, vehicle_number, vehicle_type, violation_code, category, zone, description, priority, status)
-        VALUES (?, 'Persistent Reporter', 'p@test.com', '9876543210', 'DL-01-AB-1234', 'Sedan', 'TOB-501', 'Traffic Obstruction', 'Zone A', 'Persistence verification', 'Critical', 'Assigned');
+        VALUES (?, 'Persistent Reporter', 'p@test.com', '9876543210', 'DL-01-AB-1234', 'Sedan', 'PV05', 'Traffic Obstruction', 'Zone A', 'Persistence verification', 'Critical', 'Assigned');
     """, (test_report_id,))
     conn.commit()
 
@@ -512,4 +517,3 @@ def test_database_persistence_restart(test_db):
     assert row["report_id"] == test_report_id
     assert row["priority"] == "Critical"
     conn2.close()
-

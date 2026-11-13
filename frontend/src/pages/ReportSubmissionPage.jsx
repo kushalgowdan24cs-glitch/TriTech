@@ -20,7 +20,7 @@ export function ReportSubmissionPage() {
     vehicle_number: '',
     vehicle_type: 'Sedan',
     zone: 'Zone A - Downtown Commercial',
-    violation_code: 'TOB-501',
+    violation_code: 'PV05',
     urgency_level: 'Critical',
     description: ''
   });
@@ -35,7 +35,7 @@ export function ReportSubmissionPage() {
   const [previewClassification, setPreviewClassification] = useState({
     category: 'Traffic Obstruction',
     priority: 'Critical',
-    reason: 'Code TOB-501 designates immediate traffic obstruction.'
+    reason: 'Code PV05 designates immediate traffic obstruction.'
   });
 
   // Load centralized metadata
@@ -68,35 +68,35 @@ export function ReportSubmissionPage() {
     const lowerDesc = (desc || '').toLowerCase();
     const cleanCode = (code || '').toUpperCase();
 
-    if (lowerDesc.includes('fire hydrant') || lowerDesc.includes('ambulance') || lowerDesc.includes('emergency') || cleanCode.startsWith('TOB') || urgency === 'Critical') {
+    if (lowerDesc.includes('fire hydrant') || lowerDesc.includes('ambulance') || lowerDesc.includes('emergency') || cleanCode === 'PV05' || urgency === 'Critical') {
       setPreviewClassification({
         category: 'Traffic Obstruction',
         priority: 'Critical',
-        reason: 'CRITICAL PRECEDENCE: Emergency corridor / traffic obstruction keywords detected.'
+        reason: 'CRITICAL PRECEDENCE: Emergency corridor / traffic obstruction keywords or code PV05 detected.'
       });
-    } else if (cleanCode.startsWith('PSM') || lowerDesc.includes('handicap') || lowerDesc.includes('disabled') || lowerDesc.includes('ev charging')) {
+    } else if (cleanCode === 'PV03' || lowerDesc.includes('handicap') || lowerDesc.includes('disabled') || lowerDesc.includes('ev charging')) {
       setPreviewClassification({
         category: 'Parking Space Misuse',
         priority: 'High',
-        reason: 'High urgency accessibility / dedicated infrastructure stall violation.'
+        reason: 'High urgency accessibility / dedicated infrastructure stall violation (PV03).'
       });
-    } else if (cleanCode.startsWith('IMP') || lowerDesc.includes('double park') || lowerDesc.includes('sidewalk')) {
+    } else if (cleanCode === 'PV02' || lowerDesc.includes('double park') || lowerDesc.includes('sidewalk')) {
       setPreviewClassification({
         category: 'Improper Parking',
         priority: urgency === 'High' ? 'High' : 'Medium',
-        reason: 'Improper physical alignment or obstruction of pedestrian curb.'
+        reason: 'Improper physical alignment or obstruction of pedestrian curb (PV02).'
       });
-    } else if (cleanCode.startsWith('OST') || lowerDesc.includes('overstay') || lowerDesc.includes('meter expired')) {
+    } else if (cleanCode === 'PV04' || lowerDesc.includes('overstay') || lowerDesc.includes('meter expired')) {
       setPreviewClassification({
         category: 'Overstay Violation',
         priority: urgency === 'High' ? 'High' : 'Low',
-        reason: 'Temporal parking limit exceeded at meter or posted zone.'
+        reason: 'Temporal parking limit exceeded at meter or posted zone (PV04).'
       });
     } else {
       setPreviewClassification({
         category: 'No-Parking Zone Violation',
         priority: urgency || 'Medium',
-        reason: 'Unauthorized parking in restricted municipal clearway.'
+        reason: 'Unauthorized parking in restricted municipal clearway (PV01).'
       });
     }
   };
@@ -112,7 +112,7 @@ export function ReportSubmissionPage() {
         vehicle_number: 'DL-01-AB-1234',
         vehicle_type: 'SUV / Crossover',
         zone: 'Zone C - Hospital & Transit Hub',
-        violation_code: 'TOB-501',
+        violation_code: 'PV05',
         urgency_level: 'Critical',
         description: 'Black SUV blocking hospital trauma emergency vehicle intake and ambulance bay.'
       };
@@ -124,7 +124,7 @@ export function ReportSubmissionPage() {
         vehicle_number: 'CA-12-XY-9876',
         vehicle_type: 'Sedan',
         zone: 'Zone A - Downtown Commercial',
-        violation_code: 'PSM-301',
+        violation_code: 'PV03',
         urgency_level: 'High',
         description: 'Unauthorized commercial sedan parked in disabled wheelchair ramp without permit.'
       };
@@ -136,7 +136,7 @@ export function ReportSubmissionPage() {
         vehicle_number: 'NY-04-CD-1234',
         vehicle_type: 'Truck / Heavy Commercial',
         zone: 'Zone B - Residential North',
-        violation_code: 'IMP-201',
+        violation_code: 'PV02',
         urgency_level: 'Medium',
         description: 'Heavy truck parked diagonally across two residential parking bays encroaching sidewalk.'
       };
@@ -431,16 +431,11 @@ export function ReportSubmissionPage() {
                     onChange={(e) => handleFieldChange('violation_code', e.target.value)}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white font-mono focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition cursor-pointer"
                   >
-                    <option value="TOB-501">TOB-501 (Fire Hydrant / Emergency)</option>
-                    <option value="TOB-502">TOB-502 (Active Lane Obstruction)</option>
-                    <option value="PSM-301">PSM-301 (Handicap Space Misuse)</option>
-                    <option value="PSM-302">PSM-302 (EV Bay Misuse)</option>
-                    <option value="IMP-201">IMP-201 (Double Parking)</option>
-                    <option value="IMP-202">IMP-202 (Curb Encroachment)</option>
-                    <option value="NPZ-101">NPZ-101 (Red Zone Tow-Away)</option>
-                    <option value="NPZ-102">NPZ-102 (Posted No-Parking)</option>
-                    <option value="OST-401">OST-401 (Meter Expired &gt; 2 Hours)</option>
-                    <option value="OST-402">OST-402 (Loading Bay Overstay)</option>
+                    <option value="PV05">PV05 (Traffic Obstruction - Fire Hydrant / Emergency)</option>
+                    <option value="PV03">PV03 (Parking Space Misuse - Disabled / EV Bay)</option>
+                    <option value="PV01">PV01 (No-Parking Zone Violation - Red Curb / Clearway)</option>
+                    <option value="PV02">PV02 (Improper Parking - Double Parking / Curb Straddle)</option>
+                    <option value="PV04">PV04 (Overstay Violation - Meter Expired &gt; 2 Hours)</option>
                   </select>
                   {validationStates.violation_code && (
                     <DFATraceViewer validationResult={validationStates.violation_code} title="Violation Code DFA" />
@@ -549,27 +544,27 @@ export function ReportSubmissionPage() {
 
             {/* Centralized Categories Reference */}
             <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-4 text-xs">
-              <h4 className="font-semibold text-slate-300 mb-2">Centralized 5-Category Standards:</h4>
+              <h4 className="font-semibold text-slate-300 mb-2">Centralized 5-Category Standards (PV01 - PV05):</h4>
               <ul className="space-y-1.5 text-slate-400 text-[11px]">
                 <li className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
-                  <strong>Traffic Obstruction:</strong> Fire hydrants, clearways
+                  <strong>PV05 — Traffic Obstruction:</strong> Fire hydrants, clearways
                 </li>
                 <li className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                  <strong>Parking Space Misuse:</strong> Disabled stalls, EV bays
+                  <strong>PV03 — Parking Space Misuse:</strong> Disabled stalls, EV bays
                 </li>
                 <li className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                  <strong>No-Parking Zone Violation:</strong> Red curb, tow corridors
+                  <strong>PV01 — No-Parking Zone Violation:</strong> Red curb, tow corridors
                 </li>
                 <li className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                  <strong>Improper Parking:</strong> Double parked, straddling lines
+                  <strong>PV02 — Improper Parking:</strong> Double parked, straddling lines
                 </li>
                 <li className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                  <strong>Overstay Violation:</strong> Meter expired &gt; 2 hrs
+                  <strong>PV04 — Overstay Violation:</strong> Meter expired &gt; 2 hrs
                 </li>
               </ul>
             </div>

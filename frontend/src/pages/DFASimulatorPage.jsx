@@ -18,11 +18,11 @@ const AUTOMATA_ENGINES = [
   {
     id: 'violation_code',
     name: 'Violation Code DFA',
-    format: '(NPZ|IMP|PSM|OST|TOB)-[0-9]{3}',
-    examples: ['NPZ-101', 'IMP-201', 'PSM-301', 'OST-401', 'TOB-501'],
-    invalidExamples: ['XYZ-999', 'NPZ-10', 'TOB-ABC', 'OST101'],
-    initialValue: 'TOB-501',
-    description: 'Finite state machine validating municipal violation taxonomy with 3-character category prefix followed by 3 numerical digits.'
+    format: '(PV01|PV02|PV03|PV04|PV05)',
+    examples: ['PV01', 'PV02', 'PV03', 'PV04', 'PV05'],
+    invalidExamples: ['XYZ-999', 'PV00', 'PV06', 'PV99', 'INVALID'],
+    initialValue: 'PV05',
+    description: 'Deterministic automaton validating the 5 standardized municipal violation codes (PV01 to PV05).'
   },
   {
     id: 'phone',
