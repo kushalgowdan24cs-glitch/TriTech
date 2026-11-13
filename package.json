@@ -1,0 +1,23 @@
+{
+  "name": "parkguard-fullstack",
+  "version": "1.0.0",
+  "description": "PARKGUARD - Intelligent Parking Violation Management System (React + Flask + SQLite)",
+  "scripts": {
+    "start": "python run.py",
+    "dev": "python run.py",
+    "build": "cd frontend && npm run build",
+    "test": "pytest backend/tests/test_parkguard.py -v",
+    "init-db": "python backend/init_db.py --force"
+  },
+  "keywords": [
+    "parking",
+    "violation-tracker",
+    "dfa-validation",
+    "intelligent-routing",
+    "flask",
+    "react",
+    "sqlite"
+  ],
+  "author": "TriTech Engineering Team",
+  "license": "MIT"
+}
