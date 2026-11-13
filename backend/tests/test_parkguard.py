@@ -512,3 +512,4 @@ def test_database_persistence_restart(test_db):
     assert row["report_id"] == test_report_id
     assert row["priority"] == "Critical"
     conn2.close()
+

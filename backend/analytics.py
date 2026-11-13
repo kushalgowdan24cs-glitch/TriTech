@@ -156,3 +156,4 @@ def get_analytics_metrics(
         "resolution_data": resolution_data,
         "handler_workload": handler_workload
     }
+

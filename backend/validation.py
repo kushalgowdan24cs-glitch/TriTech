@@ -431,3 +431,4 @@ def validate_report_submission(data: Dict[str, Any]) -> Tuple[bool, Dict[str, An
     # Overall validity
     is_all_valid = (len(errors) == 0)
     return is_all_valid, field_results, errors
+

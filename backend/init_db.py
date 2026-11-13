@@ -17,3 +17,4 @@ if __name__ == "__main__":
     print(f"[*] Initializing PARKGUARD SQLite Database (force_reset={force_reset})...")
     init_db(force=force_reset)
     print("[+] Database successfully initialized with tables, indices, and realistic seed data!")
+

@@ -170,3 +170,4 @@ def generate_unique_report_id(db_cursor=None) -> str:
             pass
     rand_suffix = random.randint(1000, 9999)
     return f"PKG-{year}-{rand_suffix}"
+

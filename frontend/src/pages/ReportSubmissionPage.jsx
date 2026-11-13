@@ -161,6 +161,13 @@ export function ReportSubmissionPage() {
       const res = await api.submitReport(formData);
       if (res.success) {
         setSubmissionResult(res);
+        try {
+          const recent = JSON.parse(localStorage.getItem('parkguard_recent_reports') || '[]');
+          const updated = [res.report.report_id, ...recent.filter(id => id !== res.report.report_id)].slice(0, 10);
+          localStorage.setItem('parkguard_recent_reports', JSON.stringify(updated));
+        } catch (e) {
+          console.error(e);
+        }
       } else {
         alert(res.error || (res.errors && res.errors.join('\n')) || 'Submission failed');
       }
@@ -572,3 +579,4 @@ export function ReportSubmissionPage() {
     </div>
   );
 }
+

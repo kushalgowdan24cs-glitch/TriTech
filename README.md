@@ -194,3 +194,4 @@ python run.py
 ```
 - **Web Dashboard:** [http://127.0.0.1:5173](http://127.0.0.1:5173)
 - **REST API Gateway:** [http://127.0.0.1:5000/api/health](http://127.0.0.1:5000/api/health)
+

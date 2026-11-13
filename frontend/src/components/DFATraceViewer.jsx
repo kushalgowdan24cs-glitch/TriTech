@@ -106,3 +106,4 @@ export function DFATraceViewer({ validationResult, title = 'DFA State Transition
     </div>
   );
 }
+

@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   ShieldCheck, AlertTriangle, FileText, UserCheck, 
-  Share2, BarChart3, Cpu, Activity, Download
+  Share2, BarChart3, Cpu, Activity, Download, Sun, Moon
 } from 'lucide-react';
 import { api } from '../services/api';
+import { useTheme } from '../hooks/useTheme';
 
 export function Navbar({ onCriticalCountUpdate }) {
+  const { theme, toggleTheme, isDark } = useTheme();
   const [stats, setStats] = useState({ critical_active: 0 });
   const [isBackendHealthy, setIsBackendHealthy] = useState(true);
 
@@ -44,7 +46,7 @@ export function Navbar({ onCriticalCountUpdate }) {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-slate-950/90 border-b border-slate-800 backdrop-blur-md">
+    <header className="sticky top-0 z-50 bg-slate-950/90 border-b border-slate-800 backdrop-blur-md transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Brand */}
@@ -55,9 +57,9 @@ export function Navbar({ onCriticalCountUpdate }) {
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-extrabold tracking-tight text-white text-lg">
-                  PARK<span className="text-blue-400">GUARD</span>
+                  PARK<span className="text-blue-500">GUARD</span>
                 </span>
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-500/20 text-blue-400 border border-blue-500/30">
                   GOV 2.0
                 </span>
               </div>
@@ -91,12 +93,34 @@ export function Navbar({ onCriticalCountUpdate }) {
           </nav>
 
           {/* Right Status Badges & Quick Action */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            {/* Theme Change Button */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-slate-600 transition cursor-pointer shadow-sm"
+              title={isDark ? "Switch to Light Theme (White & Blue/Black)" : "Switch to Dark Navy Theme"}
+              aria-label="Toggle Theme"
+            >
+              {isDark ? (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                  <span className="text-slate-300 text-[11px] font-medium hidden sm:inline">Light</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-blue-600" />
+                  <span className="text-slate-800 text-[11px] font-semibold hidden sm:inline">Dark</span>
+                </>
+              )}
+            </button>
+
             {/* Critical Alert Counter */}
             {stats.critical_active > 0 && (
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/15 border border-red-500/40 text-red-400 text-xs font-semibold animate-pulse shadow-sm shadow-red-500/20">
                 <AlertTriangle className="w-3.5 h-3.5" />
-                <span>{stats.critical_active} Critical Active</span>
+                <span className="hidden sm:inline">{stats.critical_active} Critical Active</span>
+                <span className="sm:hidden">{stats.critical_active}</span>
               </div>
             )}
 

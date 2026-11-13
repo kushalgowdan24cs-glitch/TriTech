@@ -314,3 +314,4 @@ def recalculate_handler_loads(conn):
         );
     """)
     conn.commit()
+

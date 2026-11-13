@@ -30,3 +30,4 @@ export function truncateText(str, maxLength = 60) {
   if (!str) return '';
   return str.length > maxLength ? str.substring(0, maxLength) + '...' : str;
 }
+
